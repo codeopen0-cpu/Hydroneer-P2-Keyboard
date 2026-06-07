@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hydroneer P2 Keyboard Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+  h1 { font-size: 24px; margin-bottom: 5px; color: #00d4ff; }
+  .subtitle { color: #888; margin-bottom: 20px; font-size: 14px; }
+  .container { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; max-width: 1000px; }
+
+  /* Controller */
+  .controller-wrap { text-align: center; }
+  .controller-wrap h2 { font-size: 16px; color: #00d4ff; margin-bottom: 10px; }
+  .controller { position: relative; width: 420px; height: 260px; background: #2d2d44; border-radius: 120px 120px 80px 80px; border: 2px solid #444; box-shadow: 0 0 30px rgba(0,212,255,0.1); }
+  .grip-l, .grip-r { position: absolute; width: 60px; height: 100px; background: #2d2d44; bottom: -30px; border: 2px solid #444; }
+  .grip-l { left: 30px; border-radius: 0 0 30px 30px; }
+  .grip-r { right: 30px; border-radius: 0 0 30px 30px; }
+
+  .btn { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: #444; border: 2px solid #666; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #aaa; transition: all 0.08s; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4); }
+  .btn.active { background: #00d4ff; border-color: #00d4ff; color: #000; box-shadow: 0 0 20px #00d4ff, inset 0 -2px 4px rgba(0,0,0,0.2); }
+  .btn .key-label { position: absolute; bottom: -18px; font-size: 9px; color: #666; white-space: nowrap; }
+
+  /* Face buttons */
+  .face-a { top: 130px; left: 280px; background: #1a8a3a; border-color: #2aac4a; } .face-a.active { background: #2aff6a; border-color: #2aff6a; }
+  .face-b { top: 90px; left: 320px; background: #c04020; border-color: #e06030; } .face-b.active { background: #ff5030; border-color: #ff5030; }
+  .face-x { top: 90px; left: 240px; background: #2060a0; border-color: #3080c0; } .face-x.active { background: #3090ff; border-color: #3090ff; }
+  .face-y { top: 50px; left: 280px; background: #b09020; border-color: #d0b030; } .face-y.active { background: #ffd030; border-color: #ffd030; }
+
+  /* D-Pad */
+  .dpad { position: absolute; left: 38px; top: 90px; width: 70px; height: 70px; }
+  .dpad-btn { position: absolute; background: #555; border: 1px solid #777; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; transition: all 0.08s; }
+  .dpad-btn.active { background: #00d4ff; border-color: #00d4ff; color: #000; box-shadow: 0 0 15px #00d4ff; }
+  .dpad-up { top: 0; left: 24px; border-radius: 4px 4px 0 0; }
+  .dpad-down { bottom: 0; left: 24px; border-radius: 0 0 4px 4px; }
+  .dpad-left { left: 0; top: 24px; border-radius: 4px 0 0 4px; }
+  .dpad-right { right: 0; top: 24px; border-radius: 0 4px 4px 0; }
+
+  /* Shoulder buttons */
+  .shoulder { position: absolute; width: 60px; height: 18px; background: #555; border: 1px solid #777; border-radius: 6px 6px 0 0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #aaa; transition: all 0.08s; }
+  .shoulder.active { background: #00d4ff; border-color: #00d4ff; color: #000; box-shadow: 0 0 15px #00d4ff; }
+  .lb { left: 30px; top: -8px; }
+  .rb { right: 30px; top: -8px; }
+
+  /* Triggers */
+  .trigger { position: absolute; width: 50px; height: 12px; background: #555; border: 1px solid #777; border-radius: 0 0 6px 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #aaa; transition: all 0.08s; }
+  .trigger.active { background: #ff6600; border-color: #ff6600; color: #000; box-shadow: 0 0 15px #ff6600; }
+  .lt { left: 35px; top: -2px; border-radius: 6px 6px 0 0; }
+  .rt { right: 35px; top: -2px; border-radius: 6px 6px 0 0; }
+
+  /* Sticks */
+  .stick { position: absolute; width: 50px; height: 50px; border-radius: 50%; background: #3a3a55; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #888; transition: all 0.08s; box-shadow: inset 0 -3px 6px rgba(0,0,0,0.5); }
+  .stick.active { border-color: #00d4ff; box-shadow: 0 0 15px #00d4ff, inset 0 -3px 6px rgba(0,0,0,0.5); }
+  .stick-l { left: 30px; top: 130px; }
+  .stick-r { right: 30px; top: 130px; }
+  .stick .inner { width: 16px; height: 16px; border-radius: 50%; background: #555; transition: all 0.08s; }
+  .stick.active .inner { background: #00d4ff; }
+
+  /* Start/Select */
+  .btn-small { position: absolute; width: 24px; height: 12px; border-radius: 6px; background: #444; border: 1px solid #666; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #888; transition: all 0.08s; }
+  .btn-small.active { background: #00d4ff; border-color: #00d4ff; color: #000; box-shadow: 0 0 10px #00d4ff; }
+  .btn-back { left: 155px; top: 100px; }
+  .btn-start { left: 235px; top: 100px; }
+
+  /* Keyboard */
+  .keyboard-wrap { text-align: center; }
+  .keyboard-wrap h2 { font-size: 16px; color: #ffaa00; margin-bottom: 10px; }
+  .kb-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 4px; }
+  .key { background: #333; border: 1px solid #555; border-radius: 4px; padding: 6px 4px; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #ccc; transition: all 0.06s; cursor: pointer; user-select: none; }
+  .key.active { background: #ffaa00; border-color: #ffaa00; color: #000; box-shadow: 0 0 15px #ffaa00; }
+  .key.wide { min-width: 50px; }
+  .key.space { min-width: 160px; }
+  .key.tab { min-width: 50px; }
+  .key.shift { min-width: 60px; }
+  .key.ctrl { min-width: 50px; }
+
+  /* Legend */
+  .legend { margin-top: 20px; background: #222; border-radius: 8px; padding: 15px 25px; max-width: 600px; }
+  .legend h3 { font-size: 14px; color: #00d4ff; margin-bottom: 8px; }
+  .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  .legend-kb { display: inline-block; background: #444; border: 1px solid #666; border-radius: 3px; padding: 1px 6px; font-size: 10px; min-width: 30px; text-align: center; }
+  .legend-arrow { color: #888; }
+  .legend-ctrl { display: inline-block; color: #00d4ff; font-size: 11px; }
+
+  /* Status */
+  .status { margin-top: 15px; display: flex; gap: 30px; font-size: 13px; }
+  .status-item { display: flex; align-items: center; gap: 6px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; transition: all 0.1s; }
+  .status-dot.on { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+
+  .footer { margin-top: 15px; font-size: 11px; color: #555; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>🎮 Hydroneer P2 Keyboard Demo</h1>
+<p class="subtitle">Press keyboard keys → see controller output. Test your UCR + vJoy mapping!</p>
+
+<div class="container">
+  <!-- Controller -->
+  <div class="controller-wrap">
+    <h2>CONTROLLER OUTPUT (virtual)</h2>
+    <div class="controller">
+      <div class="grip-l"></div>
+      <div class="grip-r"></div>
+
+      <div class="shoulder lb" id="ctrl-lb">LB</div>
+      <div class="shoulder rb" id="ctrl-rb">RB</div>
+      <div class="trigger lt" id="ctrl-lt">LT</div>
+      <div class="trigger rt" id="ctrl-rt">RT</div>
+
+      <div class="btn face-y" id="ctrl-y">Y</div>
+      <div class="btn face-b" id="ctrl-b">B</div>
+      <div class="btn face-a" id="ctrl-a">A</div>
+      <div class="btn face-x" id="ctrl-x">X</div>
+
+      <div class="dpad">
+        <div class="dpad-btn dpad-up" id="ctrl-dpad-up">▲</div>
+        <div class="dpad-btn dpad-down" id="ctrl-dpad-down">▼</div>
+        <div class="dpad-btn dpad-left" id="ctrl-dpad-left">◀</div>
+        <div class="dpad-btn dpad-right" id="ctrl-dpad-right">▶</div>
+      </div>
+
+      <div class="stick stick-l" id="ctrl-ls"><div class="inner"></div></div>
+      <div class="stick stick-r" id="ctrl-rs"><div class="inner"></div></div>
+
+      <div class="btn-small btn-back" id="ctrl-back">BACK</div>
+      <div class="btn-small btn-start" id="ctrl-start">START</div>
+    </div>
+  </div>
+
+  <!-- Keyboard -->
+  <div class="keyboard-wrap">
+    <h2>KEYBOARD INPUT</h2>
+    <div class="kb-row">
+      <div class="key" data-key="Escape">Esc</div>
+      <div class="key" data-key="1">1</div>
+      <div class="key" data-key="2">2</div>
+      <div class="key" data-key="3">3</div>
+      <div class="key" data-key="4">4</div>
+      <div class="key" data-key="5">5</div>
+      <div class="key" data-key="6">6</div>
+      <div class="key" data-key="7">7</div>
+      <div class="key" data-key="8">8</div>
+      <div class="key" data-key="9">9</div>
+      <div class="key" data-key="0">0</div>
+    </div>
+    <div class="kb-row">
+      <div class="key tab" data-key="Tab">Tab</div>
+      <div class="key" data-key="q">Q</div>
+      <div class="key" data-key="w">W</div>
+      <div class="key" data-key="e">E</div>
+      <div class="key" data-key="r">R</div>
+      <div class="key" data-key="t">T</div>
+      <div class="key" data-key="y">Y</div>
+      <div class="key" data-key="u">U</div>
+      <div class="key" data-key="i">I</div>
+      <div class="key" data-key="o">O</div>
+      <div class="key" data-key="p">P</div>
+    </div>
+    <div class="kb-row">
+      <div class="key" data-key="a">A</div>
+      <div class="key" data-key="s">S</div>
+      <div class="key" data-key="d">D</div>
+      <div class="key" data-key="f">F</div>
+      <div class="key" data-key="g">G</div>
+      <div class="key" data-key="h">H</div>
+      <div class="key" data-key="j">J</div>
+      <div class="key" data-key="k">K</div>
+      <div class="key" data-key="l">L</div>
+    </div>
+    <div class="kb-row">
+      <div class="key shift" data-key="Shift">Shift</div>
+      <div class="key" data-key="z">Z</div>
+      <div class="key" data-key="x">X</div>
+      <div class="key" data-key="c">C</div>
+      <div class="key" data-key="v">V</div>
+      <div class="key" data-key="b">B</div>
+      <div class="key" data-key="n">N</div>
+      <div class="key" data-key="m">M</div>
+      <div class="key shift" data-key="Shift">Shift</div>
+    </div>
+    <div class="kb-row">
+      <div class="key ctrl" data-key="Control">Ctrl</div>
+      <div class="key wide" data-key="Alt">Alt</div>
+      <div class="key space" data-key=" ">Space</div>
+      <div class="key wide" data-key="Alt">Alt</div>
+      <div class="key ctrl" data-key="Control">Ctrl</div>
+    </div>
+
+    <div style="margin-top: 12px; display: flex; gap: 6px; justify-content: center;">
+      <div class="key" data-key="ArrowUp" style="min-width:40px;">▲</div>
+    </div>
+    <div style="display: flex; gap: 6px; justify-content: center;">
+      <div class="key" data-key="ArrowLeft" style="min-width:32px;">◀</div>
+      <div class="key" data-key="ArrowDown" style="min-width:32px;">▼</div>
+      <div class="key" data-key="ArrowRight" style="min-width:32px;">▶</div>
+    </div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <h3>Mapping: Keyboard → Controller</h3>
+  <div class="legend-grid">
+    <div class="legend-item"><span class="legend-kb">W</span><span class="legend-arrow">→</span><span class="legend-ctrl">Left Stick UP</span></div>
+    <div class="legend-item"><span class="legend-kb">Mouse</span><span class="legend-arrow">→</span><span class="legend-ctrl">Right Stick (camera)</span></div>
+    <div class="legend-item"><span class="legend-kb">S</span><span class="legend-arrow">→</span><span class="legend-ctrl">Left Stick DOWN</span></div>
+    <div class="legend-item"><span class="legend-kb">Left Click</span><span class="legend-arrow">→</span><span class="legend-ctrl">RT (action)</span></div>
+    <div class="legend-item"><span class="legend-kb">A</span><span class="legend-arrow">→</span><span class="legend-ctrl">Left Stick LEFT</span></div>
+    <div class="legend-item"><span class="legend-kb">Right Click</span><span class="legend-arrow">→</span><span class="legend-ctrl">LT (place)</span></div>
+    <div class="legend-item"><span class="legend-kb">D</span><span class="legend-arrow">→</span><span class="legend-ctrl">Left Stick RIGHT</span></div>
+    <div class="legend-item"><span class="legend-kb">Space</span><span class="legend-arrow">→</span><span class="legend-ctrl">A (jump)</span></div>
+    <div class="legend-item"><span class="legend-kb">E</span><span class="legend-arrow">→</span><span class="legend-ctrl">B (interact)</span></div>
+    <div class="legend-item"><span class="legend-kb">Shift</span><span class="legend-arrow">→</span><span class="legend-ctrl">X (sprint)</span></div>
+    <div class="legend-item"><span class="legend-kb">Ctrl</span><span class="legend-arrow">→</span><span class="legend-ctrl">Y (crouch)</span></div>
+    <div class="legend-item"><span class="legend-kb">Tab</span><span class="legend-arrow">→</span><span class="legend-ctrl">START (inventory)</span></div>
+    <div class="legend-item"><span class="legend-kb">Q</span><span class="legend-arrow">→</span><span class="legend-ctrl">BACK</span></div>
+    <div class="legend-item"><span class="legend-kb">R / F</span><span class="legend-arrow">→</span><span class="legend-ctrl">D-Pad UP / DOWN</span></div>
+  </div>
+</div>
+
+<div class="status">
+  <div class="status-item"><span class="status-dot" id="status-demo"></span> Demo Active</div>
+  <div class="status-item" id="last-key">Last Key: <span style="color:#888;">—</span></div>
+</div>
+
+<div class="footer">
+  Open this on both machines to test simultaneously. Refresh to reset.
+</div>
+
+<script>
+  const map = {
+    'w':         { ctrl: ['ctrl-ls'], label: 'LS ↑' },
+    's':         { ctrl: ['ctrl-ls'], label: 'LS ↓' },
+    'a':         { ctrl: ['ctrl-ls'], label: 'LS ←' },
+    'd':         { ctrl: ['ctrl-ls'], label: 'LS →' },
+    ' ':         { ctrl: ['ctrl-a'], label: 'A' },
+    'e':         { ctrl: ['ctrl-b'], label: 'B' },
+    'Shift':     { ctrl: ['ctrl-x'], label: 'X' },
+    'Control':   { ctrl: ['ctrl-y'], label: 'Y' },
+    'Tab':       { ctrl: ['ctrl-start'], label: 'START' },
+    'q':         { ctrl: ['ctrl-back'], label: 'BACK' },
+    'r':         { ctrl: ['ctrl-dpad-up'], label: 'D-Pad ↑' },
+    'f':         { ctrl: ['ctrl-dpad-down'], label: 'D-Pad ↓' },
+    'ArrowUp':   { ctrl: ['ctrl-ls'], label: 'LS ↑' },
+    'ArrowDown': { ctrl: ['ctrl-ls'], label: 'LS ↓' },
+    'ArrowLeft': { ctrl: ['ctrl-ls'], label: 'LS ←' },
+    'ArrowRight':{ ctrl: ['ctrl-ls'], label: 'LS →' },
+  };
+
+  // Mouse buttons mapped to triggers
+  const mouseMap = {
+    0: { ctrl: ['ctrl-rt'], label: 'RT' },
+    2: { ctrl: ['ctrl-lt'], label: 'LT' },
+  };
+
+  let activeKeys = {};
+  let activeMouse = {};
+
+  function clearEl(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  }
+
+  function setEl(id, state) {
+    const el = document.getElementById(id);
+    if (el) {
+      if (state) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    const key = e.key === ' ' ? ' ' : e.key;
+    // Highlight keyboard
+    const kbEl = document.querySelector(`.key[data-key="${CSS.escape(key)}"]`) ||
+                 document.querySelector(`.key[data-key="${CSS.escape(e.key)}"]`);
+    if (kbEl && !activeKeys[key]) {
+      kbEl.classList.add('active');
+      activeKeys[key] = kbEl;
+    }
+
+    // Map to controller
+    const m = map[e.key] || map[key];
+    if (m) {
+      m.ctrl.forEach(id => setEl(id, true));
+    }
+
+    document.querySelector('#last-key span').textContent = e.key;
+  });
+
+  document.addEventListener('keyup', e => {
+    const key = e.key === ' ' ? ' ' : e.key;
+    if (activeKeys[key]) {
+      activeKeys[key].classList.remove('active');
+      delete activeKeys[key];
+    }
+    const m = map[e.key] || map[key];
+    if (m) {
+      m.ctrl.forEach(id => setEl(id, false));
+    }
+  });
+
+  document.addEventListener('mousedown', e => {
+    const m = mouseMap[e.button];
+    if (m) {
+      m.ctrl.forEach(id => setEl(id, true));
+      activeMouse[e.button] = m;
+    }
+  });
+
+  document.addEventListener('mouseup', e => {
+    const m = mouseMap[e.button];
+    if (m) {
+      m.ctrl.forEach(id => setEl(id, false));
+      delete activeMouse[e.button];
+    }
+  });
+
+  // Physics: clear all on blur (prevents stuck keys)
+  window.addEventListener('blur', () => {
+    document.querySelectorAll('.key.active').forEach(el => el.classList.remove('active'));
+    for (const id of ['ctrl-a','ctrl-b','ctrl-x','ctrl-y','ctrl-lb','ctrl-rb','ctrl-lt','ctrl-rt',
+      'ctrl-start','ctrl-back','ctrl-dpad-up','ctrl-dpad-down','ctrl-dpad-left','ctrl-dpad-right',
+      'ctrl-ls','ctrl-rs']) {
+      setEl(id, false);
+    }
+    activeKeys = {};
+    activeMouse = {};
+  });
+
+  // Keep the demo dot pulsing
+  const dot = document.getElementById('status-demo');
+  let pulse = true;
+  setInterval(() => {
+    dot.style.opacity = pulse ? '0.4' : '1';
+    pulse = !pulse;
+  }, 800);
+</script>
+</body>
+</html>
