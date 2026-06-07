@@ -1,5 +1,5 @@
 @echo off
-chcp 65001 >nul
+setlocal enabledelayedexpansion
 title Hydroneer Player 2 Keyboard Setup
 color 0B
 
@@ -26,9 +26,10 @@ echo    1. Installs vJoy (virtual controller driver)
 echo    2. Downloads UCR (keyboard-to-controller mapper)
 echo    3. Creates the mapping profile for Hydroneer
 echo.
-echo  Press ENTER to start, or close this window to cancel.
+echo  Press ENTER to start, or close to cancel.
 echo.
-pause
+echo.
+pause >nul
 
 :: ─── Step 1: Create folders ───
 set DOWNLOAD_DIR=%TOOL_DIR%downloads
