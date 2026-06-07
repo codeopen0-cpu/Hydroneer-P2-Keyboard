@@ -118,11 +118,11 @@ echo  (newer versions don't support mouse input)
 echo.
 
 :: Download UCR
-set UCR_ZIP=%DOWNLOAD_DIR%\UCR_v0.1.13.zip
+set UCR_ZIP=%DOWNLOAD_DIR%\UCR.zip
 set UCR_DIR=%TOOL_DIR%\UCR
 
 if not exist "%UCR_ZIP%" (
-    powershell -Command "try { Invoke-WebRequest -Uri 'https://github.com/evilC/UCR/releases/download/v0.1.13/UCR_v0.1.13.zip' -OutFile '%UCR_ZIP%' -UseBasicParsing -ErrorAction Stop; Write-Host '[OK] Downloaded UCR' } catch { Write-Host '[FAIL] Download failed' }" 2>nul
+    powershell -Command "try { Invoke-WebRequest -Uri 'https://github.com/evilC/UCR/releases/download/v0.1.13/UCR.zip' -OutFile '%UCR_ZIP%' -UseBasicParsing -ErrorAction Stop; Write-Host '[OK] Downloaded UCR' } catch { Write-Host '[FAIL] Download failed' }" 2>nul
 )
 
 if exist "%UCR_ZIP%" (
